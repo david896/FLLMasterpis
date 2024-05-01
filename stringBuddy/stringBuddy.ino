@@ -9,9 +9,7 @@ TFT_eSPI tft = TFT_eSPI();
 
 int counter = 1, menuCounter = 0;
 
-void setup(void) { 
-  Serial.begin(9600);
-  
+void setup() {   
   pinMode(UP_BUTTON, INPUT_PULLUP);
   pinMode(ENTER_BUTTON, INPUT_PULLUP);
   pinMode(DOWN_BUTTON, INPUT_PULLUP);
