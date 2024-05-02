@@ -3,16 +3,23 @@
 
 TFT_eSPI tft = TFT_eSPI();
 
-#define UP_BUTTON 5
-#define ENTER_BUTTON 16
-#define DOWN_BUTTON 33
+volatile int counter = 1, menuCounter = 0;
+const int encoderPinA = 2;
+const int encoderPinB = 3;
+volatile int lastState = LOW;
 
-int counter = 1, menuCounter = 0;
-
+<<<<<<< Updated upstream
 void setup() {   
   pinMode(UP_BUTTON, INPUT_PULLUP);
   pinMode(ENTER_BUTTON, INPUT_PULLUP);
   pinMode(DOWN_BUTTON, INPUT_PULLUP);
+=======
+void setup(void) { 
+  Serial.begin(9600);
+  
+  pinMode(encoderPinA, INPUT_PULLUP);
+  pinMode(encoderPinB, INPUT_PULLUP);
+>>>>>>> Stashed changes
 
   Serial.begin(115200);
   Serial.print("TFT Test");
@@ -22,6 +29,9 @@ void setup() {
 
   tft.fillScreen(TFT_BLACK);
   tft.pushImage(0, 0, 240, 240, Songs);
+
+  attachInterrupt(digitalPinToInterrupt(encoderPinA), updateCounter, CHANGE);
+
 }
 
 void mainMenuImage(int counter){
@@ -50,6 +60,7 @@ void mainMenuImage(int counter){
 }
 
 void loop() {
+  Serial.println(counter);
   if(menuCounter == 0){
     if(digitalRead(UP_BUTTON) == 0){
       while(1){
@@ -98,5 +109,18 @@ void loop() {
   }
 }
   
+
+void updateCounter() {
+  int currentStateA = digitalRead(encoderPinA);
+  int currentStateB = digitalRead(encoderPinB);
+  
+  if (currentStateA != lastState && currentStateA == currentStateB) {
+    counter++;
+  } else if (currentStateA != lastState && currentStateA != currentStateB) {
+    counter--;
+  }
+
+  lastState = currentStateA;
+}
 
 
