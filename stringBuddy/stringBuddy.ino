@@ -1,6 +1,16 @@
 #include <TFT_eSPI.h>
 #include "bitmap.h"
 
+/*DISPLAY PINS
+GND - GND
+VCC - VCC
+SCL - 18
+SDA - 23
+RES - 19
+DC - 14
+BLK - 3.3V
+*/
+
 TFT_eSPI tft = TFT_eSPI();
 
 #define UP_BUTTON 5
