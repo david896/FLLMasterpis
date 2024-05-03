@@ -1,6 +1,9 @@
 #include <TFT_eSPI.h>
 #include "bitmap.h"
 
+#define CLK 34
+#define DT 35
+
 /*DISPLAY PINS
 GND - GND
 VCC - VCC
@@ -13,25 +16,34 @@ BLK - 3.3V
 
 TFT_eSPI tft = TFT_eSPI();
 
-#define UP_BUTTON 5
-#define ENTER_BUTTON 16
-#define DOWN_BUTTON 33
+int counter = 0;
+int currentStateCLK;
+int lastStateCLK;
+int menuCounter = 0;
+String currentDir ="";
 
-int counter = 1, menuCounter = 0;
+void setup() {
+    pinMode(CLK, INPUT);
+    pinMode(DT, INPUT);
 
-void setup() {   
-  pinMode(UP_BUTTON, INPUT_PULLUP);
-  pinMode(ENTER_BUTTON, INPUT_PULLUP);
-  pinMode(DOWN_BUTTON, INPUT_PULLUP);
+    Serial.begin(115200);
+    delay(1000); // Add a delay after initializing serial
 
-  Serial.begin(115200);
-  Serial.print("TFT Test");
+    Serial.print("TFT Test");
 
-  tft.begin();
-  tft.setSwapBytes(true);
+    lastStateCLK = digitalRead(CLK);
 
-  tft.fillScreen(TFT_BLACK);
-  tft.pushImage(0, 0, 240, 240, Songs);
+    tft.begin();
+    tft.setSwapBytes(true);
+
+    tft.fillScreen(TFT_BLACK);
+    tft.pushImage(0, 0, 240, 240, Songs);
+
+    menuCounter = 1;
+    mainMenuImage(menuCounter);
+
+    attachInterrupt(digitalPinToInterrupt(CLK), updateEncoder, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(DT), updateEncoder, CHANGE);
 }
 
 void mainMenuImage(int counter){
@@ -60,52 +72,41 @@ void mainMenuImage(int counter){
 }
 
 void loop() {
-  if(menuCounter == 0){
-    if(digitalRead(UP_BUTTON) == 0){
-      while(1){
-        if(digitalRead(UP_BUTTON) == 1){
-          if(counter + 1 > 5){ 
-            counter = 1;
-          }
-          else counter++;
-
-          break;
-        }
-        delay(10);
-      }
-      mainMenuImage(counter);
-    }
-    if(digitalRead(DOWN_BUTTON) == 0){
-      while(1){
-        if(digitalRead(DOWN_BUTTON) == 1){
-          if(counter - 1 < 1){ 
-            counter = 5;
-          }
-          else counter--;
-
-          break;
-        }
-        delay(10);
-      }
-      mainMenuImage(counter);
-    }
-    if(digitalRead(ENTER_BUTTON) == 0){
-      while(1){
-        if(digitalRead(ENTER_BUTTON) == 1){
-          menuCounter = counter;
-          break;
-        }
-        delay(10);
-      }
-      tft.fillScreen(TFT_BLACK);
-    }
+  
+  if (counter < 0) {
+    menuCounter++;
+    mainMenuImage(menuCounter);
+  } else if (counter > 0) {
+    menuCounter++;
+    mainMenuImage(menuCounter);
   }
-  else if(menuCounter == 1){
-    tft.setCursor(0, 0, 1);
-    tft.setTextColor(TFT_MAGENTA,TFT_BLACK);
-    tft.setTextSize(3);
-    tft.print("Songs");
-  }
+
+  counter = 0;
+
+  delay(100);
+}
+
+void updateEncoder() {
+  currentStateCLK = digitalRead(CLK);
+
+  if (currentStateCLK != lastStateCLK) {
+    if (currentStateCLK == 1) {
+        if (digitalRead(DT) != currentStateCLK) {
+          counter--;
+          currentDir ="CCW";
+        } else {
+          counter++;
+          currentDir ="CW";
+        }
+
+        Serial.print("Direction: ");
+        Serial.print(currentDir);
+        Serial.print(" | Counter: ");
+        Serial.println(counter);
+      }
+    }
+    
+  lastStateCLK = currentStateCLK;
 }
   
 
