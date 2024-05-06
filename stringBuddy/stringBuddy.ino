@@ -17,10 +17,15 @@ BLK - 3.3V
 
 TFT_eSPI tft = TFT_eSPI();
 
+bool switchedMenu = false; // basically cand apesi butonul pe encoder valoarea variabilei acestea se schimba in opusul ei   --David 
+
 volatile int counter = 0;
+volatile int secondaryCounter = 0;
+int menuCounter = 0;
+
 volatile int lastState = LOW;
 volatile int lastStateButton = LOW;
-int menuCounter = 0;
+
 String currentDir ="";
 unsigned long lastButtonPress = 0;
 
@@ -28,26 +33,25 @@ void updateCounter() {
   int currentStateA = digitalRead(encoderPinA);
   int currentStateB = digitalRead(encoderPinB);
   
-  if (currentStateA != lastState && currentStateA == currentStateB) {
-    counter++;
-  } else if (currentStateA != lastState && currentStateA != currentStateB) {
-    counter--;
+  if (switchedMenu == false){
+      if (currentStateA != lastState && currentStateA == currentStateB) {
+      counter++;
+    } else if (currentStateA != lastState && currentStateA != currentStateB) {
+      counter--;
+    } 
   }
+  else {
+    if (currentStateA != lastState && currentStateA == currentStateB) {
+      secondaryCounter++;
+    } else if (currentStateA != lastState && currentStateA != currentStateB) {
+      secondaryCounter--;
+    } 
+  }
+  
 
   lastState = currentStateA;
 }
 
-void enterMenu() {
-  int currentStateButton = digitalRead(encoderButton);
-  if(currentStateButton != lastStateButton && currentStateButton == 1){
-    tft.fillScreen(TFT_BLACK);
-    tft.setCursor(0, 0);
-    tft.setTextSize(5);
-    tft.setTextColor(TFT_MAGENTA);
-    tft.print("TESTING");
-  }
-
-}
 
 void mainMenuImage(int counter){
   switch(counter) {
@@ -77,6 +81,23 @@ void mainMenuImage(int counter){
   }
 }
 
+void subMenuImage(int secondaryCounter){
+  
+}
+
+void switchMenuOrInteract() { // functia asta este responsabila de actiunile ce le efectueaza butonul de pe encoder. --David
+  if (switchedMenu == false) {
+    switchedMenu = true; // face switch la meniul secundar. --David
+  }
+  else {
+    runSelectedAction(counter, secondaryCounter);
+  }
+}
+
+void runSelectedAction(volatile int counter1,volatile int counter2){
+
+}
+
 void setup() {
   Serial.begin(115200);
 
@@ -97,12 +118,16 @@ void setup() {
 
   attachInterrupt(digitalPinToInterrupt(encoderPinA), updateCounter, CHANGE);
   attachInterrupt(digitalPinToInterrupt(encoderPinB), updateCounter, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(encoderButton), enterMenu, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(encoderButton), switchMenu, CHANGE); // am schimbat aici la functia switchMenu simplu in caz ca o sa o folosim pe cealalta.  --David
 }
 
 
+
+
 void loop() {  
-  if (counter < -1) {
+
+  if(switchedMenu == false) {
+    if (counter < -1) {
     Serial.println(counter);
     if(menuCounter + 1 > 5){
       menuCounter = 0;
@@ -112,11 +137,12 @@ void loop() {
     }
     mainMenuImage(menuCounter);
     counter = 0;
-  } 
-  else if (counter > 1) {
-    Serial.println(counter);
-    if(menuCounter - 2 < 0){
+    } 
+    else if (counter > 1) {
+      Serial.println(counter);
+      if(menuCounter - 2 < 0){
       menuCounter = 5;
+      }
     }
     else{
       menuCounter--;
@@ -125,20 +151,16 @@ void loop() {
     counter = 0;
   }
 
+  else{
+
+  }
   delay(10);
 }
-
-void updateCounter() {
-  int currentStateA = digitalRead(encoderPinA);
-  int currentStateB = digitalRead(encoderPinB);
   
-  if (currentStateA != lastState && currentStateA == currentStateB) {
-    counter++;
-  } else if (currentStateA != lastState && currentStateA != currentStateB) {
-    counter--;
-  }
 
-  lastState = currentStateA;
-}
+  
+
+
+
 
 
