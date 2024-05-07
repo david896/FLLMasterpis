@@ -85,16 +85,33 @@ void subMenuImage(int secondaryCounter){
   
 }
 
-void switchMenuOrInteract() { // functia asta este responsabila de actiunile ce le efectueaza butonul de pe encoder. --David
-  if (switchedMenu == false) {
-    switchedMenu = true; // face switch la meniul secundar. --David
-  }
-  else {
-    runSelectedAction(counter, secondaryCounter);
+void switchMenuOrInteract() {
+  static unsigned long buttonPressStartTime = millis();
+  const unsigned long longPressDuration = 8000; 
+
+  if (digitalRead(encoderButton) == LOW) {
+    buttonPressStartTime = millis(); //Record the start time of button press
+    while (digitalRead(encoderButton) == LOW){
+      //Wait until the button is released or the long press duration is reached
+      if (millis() - buttonPressStartTime >= longPressDuration) {
+        //go back to the main menu
+        Serial.println("executed long press function");
+        delay(2000);
+        return;
+      }
+    }
+
+    //button is released before 2 second duration
+    if (switchedMenu == false) { //short press, currently in main menu
+      switchedMenu = true; //switch to secondary menu
+    }
+    else{ //short press, already in secondary menu, thus interacting with the contents
+      runSelectedAction(counter, secondaryCounter);
+    }
   }
 }
 
-void runSelectedAction(volatile int counter1,volatile int counter2){
+void runSelectedAction(volatile int counter1, volatile int counter2){
 
 }
 
@@ -118,37 +135,34 @@ void setup() {
 
   attachInterrupt(digitalPinToInterrupt(encoderPinA), updateCounter, CHANGE);
   attachInterrupt(digitalPinToInterrupt(encoderPinB), updateCounter, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(encoderButton), switchMenu, CHANGE); // am schimbat aici la functia switchMenu simplu in caz ca o sa o folosim pe cealalta.  --David
+  attachInterrupt(digitalPinToInterrupt(encoderButton), switchMenuOrInteract, CHANGE); // am schimbat aici la functia switchMenu simplu in caz ca o sa o folosim pe cealalta.  --David
 }
-
-
-
 
 void loop() {  
 
   if(switchedMenu == false) {
     if (counter < -1) {
-    Serial.println(counter);
-    if(menuCounter + 1 > 5){
-      menuCounter = 0;
-    }
-    else{
-      menuCounter++;
-    }
-    mainMenuImage(menuCounter);
-    counter = 0;
+      Serial.println("right");
+      if(menuCounter + 1 > 5){
+        menuCounter = 0;
+      }
+      else{
+        menuCounter++;
+      }
+      mainMenuImage(menuCounter);
+      counter = 0;
     } 
     else if (counter > 1) {
-      Serial.println(counter);
-      if(menuCounter - 2 < 0){
-      menuCounter = 5;
+      Serial.println("left");
+      if(menuCounter - 1 < 0){
+        menuCounter = 5;
       }
+      else{
+        menuCounter--;
+      }
+      mainMenuImage(menuCounter);
+      counter = 0;
     }
-    else{
-      menuCounter--;
-    }
-    mainMenuImage(menuCounter);
-    counter = 0;
   }
 
   else{
