@@ -47,8 +47,8 @@ void updateCounter() {
 }
 
 
-void menuImage(int pos, int counter){
-  if(pos == 1){
+void menuImage(int pos, int counter) {
+  if (pos == 1) {
     switch (counter) {
       case 1:
         tft.fillScreen(TFT_BLACK);
@@ -75,9 +75,12 @@ void menuImage(int pos, int counter){
         break;
     }
   }
-}
-
-void subMenuImage(int secondaryCounter) {
+  else if(pos == 2){
+    switch(menuPos[1]){
+      case 1:
+      
+    }
+  }
 }
 
 void detectHold() {
@@ -151,5 +154,6 @@ void loop() {
     mainMenuImage(menuPos[pos]);
     encoderPos = 0;
   }
+
   delay(10);
 }
