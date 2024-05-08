@@ -17,102 +17,95 @@ BLK - 3.3V
 
 TFT_eSPI tft = TFT_eSPI();
 
-bool switchedMenu = false; // basically cand apesi butonul pe encoder valoarea variabilei acestea se schimba in opusul ei   --David 
+int menuPos[4] = {0, 1, 1, 1};
+unsigned int pos = 1;
 
-volatile int counter = 0;
-volatile int secondaryCounter = 0;
-int menuCounter = 0;
+const unsigned long longPressDuration = 1000;
+unsigned long clickTime;
+bool isClicked;
+bool isLongClick;
+
+volatile int encoderPos = 0;
 
 volatile int lastState = LOW;
 volatile int lastStateButton = LOW;
 
-String currentDir ="";
+String currentDir = "";
 unsigned long lastButtonPress = 0;
 
 void updateCounter() {
   int currentStateA = digitalRead(encoderPinA);
   int currentStateB = digitalRead(encoderPinB);
-  
-  if (switchedMenu == false){
-      if (currentStateA != lastState && currentStateA == currentStateB) {
-      counter++;
-    } else if (currentStateA != lastState && currentStateA != currentStateB) {
-      counter--;
-    } 
+
+  if (currentStateA != lastState && currentStateA == currentStateB) {
+    encoderPos++;
+  } else if (currentStateA != lastState && currentStateA != currentStateB) {
+    encoderPos--;
   }
-  else {
-    if (currentStateA != lastState && currentStateA == currentStateB) {
-      secondaryCounter++;
-    } else if (currentStateA != lastState && currentStateA != currentStateB) {
-      secondaryCounter--;
-    } 
-  }
-  
 
   lastState = currentStateA;
 }
 
 
-void mainMenuImage(int counter){
-  switch(counter) {
-    case 1:
-      tft.fillScreen(TFT_BLACK);
-      tft.pushImage(0, 0, 240, 240, Songs);
-      break;
-    case 2:
-      tft.fillScreen(TFT_BLACK);
-      tft.pushImage(0, 0, 240, 240, Chords);
-      break;
-    case 3:
-      tft.fillScreen(TFT_BLACK);
-      tft.pushImage(0, 0, 240, 240, Scales);
-      break;
-    case 4:
-      tft.fillScreen(TFT_BLACK);
-      tft.pushImage(0, 0, 240, 240, Games);
-      break;
-    case 5:
-      tft.fillScreen(TFT_BLACK);
-      tft.pushImage(0, 0, 240, 240, Settings);
-      break;
-    case 6:
-      tft.fillScreen(TFT_WHITE);
-      break;
+void menuImage(int pos, int counter){
+  if(pos == 1){
+    switch (counter) {
+      case 1:
+        tft.fillScreen(TFT_BLACK);
+        tft.pushImage(0, 0, 240, 240, Songs);
+        break;
+      case 2:
+        tft.fillScreen(TFT_BLACK);
+        tft.pushImage(0, 0, 240, 240, Chords);
+        break;
+      case 3:
+        tft.fillScreen(TFT_BLACK);
+        tft.pushImage(0, 0, 240, 240, Scales);
+        break;
+      case 4:
+        tft.fillScreen(TFT_BLACK);
+        tft.pushImage(0, 0, 240, 240, Games);
+        break;
+      case 5:
+        tft.fillScreen(TFT_BLACK);
+        tft.pushImage(0, 0, 240, 240, Settings);
+        break;
+      case 6:
+        tft.fillScreen(TFT_WHITE);
+        break;
+    }
   }
 }
 
-void subMenuImage(int secondaryCounter){
-  
+void subMenuImage(int secondaryCounter) {
 }
 
-void switchMenuOrInteract() {
-  static unsigned long buttonPressStartTime = millis();
-  const unsigned long longPressDuration = 8000; 
-
+void detectHold() {
   if (digitalRead(encoderButton) == LOW) {
-    buttonPressStartTime = millis(); //Record the start time of button press
-    while (digitalRead(encoderButton) == LOW){
-      //Wait until the button is released or the long press duration is reached
-      if (millis() - buttonPressStartTime >= longPressDuration) {
-        //go back to the main menu
-        Serial.println("executed long press function");
-        delay(2000);
-        return;
+    isClicked = true;
+    if (millis() - clickTime >= longPressDuration && !isLongClick) {
+      //long press
+      isLongClick = true;
+      if (pos != 1) pos--;  //going back a menu
+    }
+  }
+  if (digitalRead(encoderButton) == HIGH) {
+    if (isClicked && !isLongClick) {
+      //short press
+      Serial.println("short press");
+      if (pos == 1) {         //in main menu
+        pos++;                //enter secondary menu
+      } else if (pos == 2) {  //already in secondary menu
+        //interact with secondary menu
       }
     }
-
-    //button is released before 2 second duration
-    if (switchedMenu == false) { //short press, currently in main menu
-      switchedMenu = true; //switch to secondary menu
-    }
-    else{ //short press, already in secondary menu, thus interacting with the contents
-      runSelectedAction(counter, secondaryCounter);
-    }
+    clickTime = millis();
+    isClicked = false;
+    isLongClick = false;
   }
 }
 
-void runSelectedAction(volatile int counter1, volatile int counter2){
-
+void runSelectedAction(volatile int counter1, volatile int counter2) {
 }
 
 void setup() {
@@ -130,51 +123,33 @@ void setup() {
   tft.fillScreen(TFT_BLACK);
   tft.pushImage(0, 0, 240, 240, Songs);
 
-  menuCounter = 1;
-  mainMenuImage(menuCounter);
+  mainMenuImage(1);
 
   attachInterrupt(digitalPinToInterrupt(encoderPinA), updateCounter, CHANGE);
   attachInterrupt(digitalPinToInterrupt(encoderPinB), updateCounter, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(encoderButton), switchMenuOrInteract, CHANGE); // am schimbat aici la functia switchMenu simplu in caz ca o sa o folosim pe cealalta.  --David
+  //attachInterrupt(digitalPinToInterrupt(encoderButton), switchMenuOrInteract, CHANGE); // am schimbat aici la functia switchMenu simplu in caz ca o sa o folosim pe cealalta.  --David
 }
 
-void loop() {  
+void loop() {
 
-  if(switchedMenu == false) {
-    if (counter < -1) {
-      Serial.println("right");
-      if(menuCounter + 1 > 5){
-        menuCounter = 0;
-      }
-      else{
-        menuCounter++;
-      }
-      mainMenuImage(menuCounter);
-      counter = 0;
-    } 
-    else if (counter > 1) {
-      Serial.println("left");
-      if(menuCounter - 1 < 0){
-        menuCounter = 5;
-      }
-      else{
-        menuCounter--;
-      }
-      mainMenuImage(menuCounter);
-      counter = 0;
+  detectHold();
+
+  if (encoderPos < -1) {
+    if (menuPos[pos] + 1 > 5) {
+      menuPos[pos] = 1;
+    } else {
+      menuPos[pos]++;
     }
-  }
-
-  else{
-
+    mainMenuImage(menuPos[pos]);
+    encoderPos = 0;
+  } else if (encoderPos > 1) {
+    if (menuPos[pos] - 1 < 0) {
+      menuPos[pos] = 5;
+    } else {
+      menuPos[pos]--;
+    }
+    mainMenuImage(menuPos[pos]);
+    encoderPos = 0;
   }
   delay(10);
 }
-  
-
-  
-
-
-
-
-
