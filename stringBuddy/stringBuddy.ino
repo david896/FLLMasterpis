@@ -17,7 +17,9 @@ BLK - 3.3V
 
 TFT_eSPI tft = TFT_eSPI();
 
-int menuPos[4] = {0, 1, 1, 1};
+
+
+int menuPos[3] = {0, 1, 1}; // first element is not being used
 unsigned int pos = 1;
 
 const unsigned long longPressDuration = 1000;
@@ -46,42 +48,17 @@ void updateCounter() {
   lastState = currentStateA;
 }
 
-
-void menuImage(int pos, int counter) {
-  if (pos == 1) {
-    switch (counter) {
-      case 1:
-        tft.fillScreen(TFT_BLACK);
-        tft.pushImage(0, 0, 240, 240, Songs);
-        break;
-      case 2:
-        tft.fillScreen(TFT_BLACK);
-        tft.pushImage(0, 0, 240, 240, Chords);
-        break;
-      case 3:
-        tft.fillScreen(TFT_BLACK);
-        tft.pushImage(0, 0, 240, 240, Scales);
-        break;
-      case 4:
-        tft.fillScreen(TFT_BLACK);
-        tft.pushImage(0, 0, 240, 240, Games);
-        break;
-      case 5:
-        tft.fillScreen(TFT_BLACK);
-        tft.pushImage(0, 0, 240, 240, Settings);
-        break;
-      case 6:
-        tft.fillScreen(TFT_WHITE);
-        break;
-    }
-  }
-  else if(pos == 2){
-    switch(menuPos[1]){
-      case 1:
-      
-    }
+void mainMenuImage(int counter) {
+  Serial.print(menuPos[pos]);
+  if(pos == 1){
+    tft.fillScreen(TFT_BLACK);
+    tft.pushImage(0, 0, 240, 240, imageDataBase[0][counter]);
+  } else{
+    tft.fillScreen(TFT_BLACK);
+    tft.pushImage(0, 0, 240, 240, imageDataBase[counter][menuPos[1]]);
   }
 }
+
 
 void detectHold() {
   if (digitalRead(encoderButton) == LOW) {
@@ -94,9 +71,9 @@ void detectHold() {
   }
   if (digitalRead(encoderButton) == HIGH) {
     if (isClicked && !isLongClick) {
-      //short press
-      Serial.println("short press");
-      if (pos == 1) {         //in main menu
+      //short pressx
+      if (pos == 1) {    
+        Serial.println("In sec Menu");    //in main menu
         pos++;                //enter secondary menu
       } else if (pos == 2) {  //already in secondary menu
         //interact with secondary menu
@@ -146,7 +123,7 @@ void loop() {
     mainMenuImage(menuPos[pos]);
     encoderPos = 0;
   } else if (encoderPos > 1) {
-    if (menuPos[pos] - 1 < 0) {
+    if (menuPos[pos] - 1 == 0) {
       menuPos[pos] = 5;
     } else {
       menuPos[pos]--;
