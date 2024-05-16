@@ -1,6 +1,7 @@
 #include <TFT_eSPI.h>
 #include "bitmap.h"
 
+
 #define encoderPinA 34
 #define encoderPinB 33
 #define encoderButton 35
