@@ -17,8 +17,6 @@ BLK - 3.3V
 
 TFT_eSPI tft = TFT_eSPI();
 
-
-
 int menuPos[3] = {0, 1, 1}; // first element is not being used
 unsigned int pos = 1;
 
