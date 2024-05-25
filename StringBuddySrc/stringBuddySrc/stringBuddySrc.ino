@@ -69,24 +69,7 @@ void mainMenuImage(int counter) {
     tft.pushImage(0, 0, 240, 240, imageDataBase[0][counter]);
   } else{
     tft.fillScreen(TFT_BLACK);
-    switch(pos) {
-      case 1:
-        writeInTheMiddle(songsMenu[1]);
-        break;
-      case 2:
-        writeInTheMiddle(chordsMenu[2]);
-        break;
-      case 3:
-        writeInTheMiddle(scalesMenu[3]);
-        break;
-      case 4:
-        writeInTheMiddle(gamesMenu[4]);
-        break;
-      case 5:
-        writeInTheMiddle(settingsMenu[5]);
-        break;
-      
-    }
+    writeInTheMiddle(menuOptions[menuPos[1]][menuPos[2]]);
   }
 }
 
