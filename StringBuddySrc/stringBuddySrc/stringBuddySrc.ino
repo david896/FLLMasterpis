@@ -1,5 +1,7 @@
 #include <TFT_eSPI.h>
 #include "bitmap.h"
+#include "ledControl.h"
+
 
 #define encoderPinA 34
 #define encoderPinB 33
@@ -88,6 +90,8 @@ void runSelectedAction(volatile int counter1, volatile int counter2) {
 
 void setup() {
   Serial.begin(115200);
+
+  ledInit();
 
   pinMode(encoderPinA, INPUT_PULLUP);
   pinMode(encoderPinB, INPUT_PULLUP);

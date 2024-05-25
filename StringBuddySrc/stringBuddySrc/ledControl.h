@@ -33,9 +33,7 @@ CRGB leds4[NUM_LEDS4];
 CRGB leds5[NUM_LEDS5];
 CRGB leds6[NUM_LEDS6];
 
-void setup() {
-  Serial.begin(115200);
-
+void ledInit() {
   FastLED.addLeds<LED_TYPE, LED_PIN1, COLOR_ORDER>(leds1, NUM_LEDS1).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, LED_PIN2, COLOR_ORDER>(leds2, NUM_LEDS2).setCorrection(TypicalLEDStrip);
   FastLED.addLeds<LED_TYPE, LED_PIN3, COLOR_ORDER>(leds3, NUM_LEDS3).setCorrection(TypicalLEDStrip);
@@ -47,16 +45,6 @@ void setup() {
   FastLED.setBrightness(255);
 
   FastLED.show();
-}
-
-void loop() {
-  for (int i = 1; i <= 6; i++) {
-    for (int j = 1; j <= 12; j++) {
-      clearLeds();
-      turnOnLed(i, j, CRGB(222, 1, 245));
-      delay(20);
-    }
-  }
 }
 
 void clearLeds() {
