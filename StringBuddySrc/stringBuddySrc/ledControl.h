@@ -51,6 +51,25 @@ void clearLeds() {
   FastLED.clear();
 }
 
+void turnOnFret(CRGB leds[], int fret, CRGB color) {
+  if (fret <= 3) {
+    leds[fret + 3] = color;
+  } else if (fret == 4) {
+    leds[7] = color;
+    leds[8] = color;
+  } else if (fret == 5) {
+    leds[9] = color;
+  } else if (fret == 6) {
+    leds[10] = color;
+    leds[11] = color;
+  } else if (fret == 7) {
+    leds[12] = color;
+  } else {
+    leds[22 - (12 - fret) * 2] = color;
+    leds[21 - (12 - fret) * 2] = color;
+  }
+}
+
 void turnOnLed(int string, int fret, CRGB fingerColor) {
   if (fret > 12)
     return;
@@ -79,21 +98,4 @@ void turnOnLed(int string, int fret, CRGB fingerColor) {
   FastLED.show();
 }
 
-void turnOnFret(CRGB leds[], int fret, CRGB color) {
-  if (fret <= 3) {
-    leds[fret + 3] = color;
-  } else if (fret == 4) {
-    leds[7] = color;
-    leds[8] = color;
-  } else if (fret == 5) {
-    leds[9] = color;
-  } else if (fret == 6) {
-    leds[10] = color;
-    leds[11] = color;
-  } else if (fret == 7) {
-    leds[12] = color;
-  } else {
-    leds[22 - (12 - fret) * 2] = color;
-    leds[21 - (12 - fret) * 2] = color;
-  }
-}
+
