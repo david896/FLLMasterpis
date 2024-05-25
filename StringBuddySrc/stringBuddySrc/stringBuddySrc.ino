@@ -53,7 +53,7 @@ void mainMenuImage(int counter) {
     tft.pushImage(0, 0, 240, 240, imageDataBase[0][counter]);
   } else{
     tft.fillScreen(TFT_BLACK);
-    tft.pushImage(0, 0, 240, 240, imageDataBase[counter][menuPos[1]]);
+    
   }
 }
 
