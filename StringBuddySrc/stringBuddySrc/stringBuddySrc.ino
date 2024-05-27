@@ -1,5 +1,7 @@
 #include <TFT_eSPI.h>
 #include "bitmap.h"
+#include "ledControl.h"
+
 
 
 #define encoderPinA 34
@@ -47,6 +49,20 @@ void updateCounter() {
   lastState = currentStateA;
 }
 
+void writeInTheMiddle(const char* text) {
+  tft.setTextColor(TFT_WHITE);
+  tft.setTextSize(2);
+  
+  // Print the message in the center of the screen
+  // Calculate the center coordinates
+  int centerX = tft.width() / 2;
+  int centerY = tft.height() / 2;
+  
+  // Print the message at the center coordinates
+  tft.setCursor(centerX - (strlen(text) * 6), centerY - 8); // Adjust 6 according to your font
+  tft.print(text);
+}
+
 void mainMenuImage(int counter) {
   Serial.print(menuPos[pos]);
   if(pos == 1){
@@ -54,7 +70,7 @@ void mainMenuImage(int counter) {
     tft.pushImage(0, 0, 240, 240, imageDataBase[0][counter]);
   } else{
     tft.fillScreen(TFT_BLACK);
-    tft.pushImage(0, 0, 240, 240, imageDataBase[counter][menuPos[1]]);
+    writeInTheMiddle(menuOptions[menuPos[1]][menuPos[2]]);
   }
 }
 
@@ -75,7 +91,7 @@ void detectHold() {
         Serial.println("In sec Menu");    //in main menu
         pos++;                //enter secondary menu
       } else if (pos == 2) {  //already in secondary menu
-        //interact with secondary menu
+        runSelectedAction(menuPos[1], menuPos[2]); //interact with secondary menu
       }
     }
     clickTime = millis();
@@ -84,11 +100,13 @@ void detectHold() {
   }
 }
 
-void runSelectedAction(volatile int counter1, volatile int counter2) {
+void runSelectedAction(int counter1, int counter2) {
 }
 
 void setup() {
   Serial.begin(115200);
+
+  ledInit();
 
   pinMode(encoderPinA, INPUT_PULLUP);
   pinMode(encoderPinB, INPUT_PULLUP);
