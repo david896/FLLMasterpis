@@ -101,6 +101,7 @@ void detectHold() {
 }
 
 void runSelectedAction(int counter1, int counter2) {
+  functionArray[menuPos[1]][menuPos[2]]();
 }
 
 void setup() {

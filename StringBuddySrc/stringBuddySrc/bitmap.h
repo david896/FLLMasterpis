@@ -1,11 +1,11 @@
 const int TOTAL_MENUS = 5;
 
-const char* menuOptions[][TOTAL_MENUS] = {
+const char* menuOptions[][TOTAL_MENUS+1] = {
   NULL,
-  NULL, "Daca ploaia s-ar opri", "Knocking On Havens Door", "Nothing Else Matters", "Fly Birds"
-  NULL, "A chord", "B chord", "C chord", "D chord", "E chord", "F chord", "G chord"
+  NULL, "Daca ploaia s-ar opri", "Knocking On Havens Door", "Nothing Else Matters", "Fly Birds",
+  NULL, "A major chord", "A minor chord", "C major chord", "D major chorc", "G major chord",
   NULL, "A minor", "D minor", "Dmajor"
-  NULL, "RePLAY"
+  NULL, "RePLAY",
   NULL, "Brightness", "Firmware" 
 }
 
