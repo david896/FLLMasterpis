@@ -2,8 +2,6 @@
 #include "bitmap.h"
 #include "ledControl.h"
 
-
-
 #define encoderPinA 34
 #define encoderPinB 33
 #define encoderButton 35
@@ -20,88 +18,78 @@ BLK - 3.3V
 
 TFT_eSPI tft = TFT_eSPI();
 
-int menuPos[3] = {0, 1, 1}; // first element is not being used
-unsigned int pos = 1;
+int menuPositions[2] = { 0, 0 };
+int pos = 0;
 
 const unsigned long longPressDuration = 1000;
 unsigned long clickTime;
 bool isClicked;
 bool isLongClick;
 
-volatile int encoderPos = 0;
+int encoderPos = 0;
 
 volatile int lastState = LOW;
 volatile int lastStateButton = LOW;
-
-String currentDir = "";
-unsigned long lastButtonPress = 0;
 
 void updateCounter() {
   int currentStateA = digitalRead(encoderPinA);
   int currentStateB = digitalRead(encoderPinB);
 
-  if (currentStateA != lastState && currentStateA == currentStateB) {
-    encoderPos++;
-  } else if (currentStateA != lastState && currentStateA != currentStateB) {
+  if (currentStateA != lastState && currentStateA == currentStateB) {  // clockwise
     encoderPos--;
+  } else if (currentStateA != lastState && currentStateA != currentStateB) {  // anticlockwise
+    encoderPos++;
   }
-
   lastState = currentStateA;
 }
 
 void writeInTheMiddle(const char* text) {
   tft.setTextColor(TFT_WHITE);
   tft.setTextSize(2);
-  
+
   // Print the message in the center of the screen
   // Calculate the center coordinates
   int centerX = tft.width() / 2;
   int centerY = tft.height() / 2;
-  
+
   // Print the message at the center coordinates
-  tft.setCursor(centerX - (strlen(text) * 6), centerY - 8); // Adjust 6 according to your font
+  tft.setCursor(centerX - (strlen(text) * 6), centerY - 8);  // Adjust 6 according to your font
   tft.print(text);
 }
 
 void mainMenuImage(int counter) {
-  Serial.print(menuPos[pos]);
-  if(pos == 1){
+  if (pos == 0) {
     tft.fillScreen(TFT_BLACK);
-    tft.pushImage(0, 0, 240, 240, imageDataBase[0][counter]);
-  } else{
+    tft.pushImage(0, 0, 240, 240, imageDataBase[counter]);
+  } else if (pos == 1) {
     tft.fillScreen(TFT_BLACK);
-    writeInTheMiddle(menuOptions[menuPos[1]][menuPos[2]]);
+    writeInTheMiddle(menuOptions[menuPositions[0]][menuPositions[1]]);
   }
 }
-
 
 void detectHold() {
   if (digitalRead(encoderButton) == LOW) {
     isClicked = true;
-    if (millis() - clickTime >= longPressDuration && !isLongClick) {
-      //long press
+    if (millis() - clickTime >= longPressDuration && !isLongClick) {  //long press
       isLongClick = true;
-      if (pos != 1) pos--;  //going back a menu
+      if (pos > 0) pos--;
+      mainMenuImage(menuPositions[pos]);
     }
   }
   if (digitalRead(encoderButton) == HIGH) {
-    if (isClicked && !isLongClick) {
-      //short pressx
-      if (pos == 1) {    
-        Serial.println("In sec Menu");    //in main menu
-        pos++;                //enter secondary menu
-      } else if (pos == 2) {  //already in secondary menu
-        runSelectedAction(menuPos[1], menuPos[2]); //interact with secondary menu
+    if (isClicked && !isLongClick) {  //short press
+      if (pos == 0) {
+        pos++;
+        mainMenuImage(menuPositions[pos]);
+        menuPositions[1] = 0;
+      } else if (pos > 0) {
+        //run submenu action
       }
     }
     clickTime = millis();
     isClicked = false;
     isLongClick = false;
   }
-}
-
-void runSelectedAction(int counter1, int counter2) {
-  functionArray[menuPos[1]][menuPos[2]]();
 }
 
 void setup() {
@@ -113,42 +101,61 @@ void setup() {
   pinMode(encoderPinB, INPUT_PULLUP);
   pinMode(encoderButton, INPUT_PULLUP);
 
-  Serial.print("TFT Test");
-
   tft.begin();
   tft.setSwapBytes(true);
-
   tft.fillScreen(TFT_BLACK);
-  tft.pushImage(0, 0, 240, 240, Songs);
-
-  mainMenuImage(1);
 
   attachInterrupt(digitalPinToInterrupt(encoderPinA), updateCounter, CHANGE);
   attachInterrupt(digitalPinToInterrupt(encoderPinB), updateCounter, CHANGE);
-  //attachInterrupt(digitalPinToInterrupt(encoderButton), switchMenuOrInteract, CHANGE); // am schimbat aici la functia switchMenu simplu in caz ca o sa o folosim pe cealalta.  --David
+
+  mainMenuImage(menuPositions[pos]);
 }
 
 void loop() {
-
   detectHold();
-
-  if (encoderPos < -1) {
-    if (menuPos[pos] + 1 > 5) {
-      menuPos[pos] = 1;
-    } else {
-      menuPos[pos]++;
+  if (pos == 0)
+  {
+    if (encoderPos < -1) {
+      int length = sizeof(imageDataBase) / sizeof(imageDataBase[0]);
+      if (menuPositions[pos] - 1 < 0) {
+        menuPositions[pos] = length - 1;
+      } else {
+        menuPositions[pos]--;
+      }
+      mainMenuImage(menuPositions[pos]);
+      encoderPos = 0;
+    } else if (encoderPos > 1) {
+      int length = sizeof(imageDataBase) / sizeof(imageDataBase[0]);
+      if (menuPositions[pos] + 1 > length - 1) {
+        menuPositions[pos] = 0;
+      } else {
+        menuPositions[pos]++;
+      }
+      mainMenuImage(menuPositions[pos]);
+      encoderPos = 0;
     }
-    mainMenuImage(menuPos[pos]);
-    encoderPos = 0;
-  } else if (encoderPos > 1) {
-    if (menuPos[pos] - 1 == 0) {
-      menuPos[pos] = 5;
-    } else {
-      menuPos[pos]--;
-    }
-    mainMenuImage(menuPos[pos]);
-    encoderPos = 0;
   }
-
+  else if (pos == 1)
+  {
+    if (encoderPos < -1) {
+      int length = optionsLengths[menuPositions[0]];
+      if (menuPositions[pos] - 1 < 0) {
+        menuPositions[pos] = length - 1;
+      } else {
+        menuPositions[pos]--;
+      }
+      mainMenuImage(menuPositions[pos]);
+      encoderPos = 0;
+    } else if (encoderPos > 1) {
+      int length = optionsLengths[menuPositions[0]];
+      if (menuPositions[pos] + 1 > length - 1) {
+        menuPositions[pos] = 0;
+      } else {
+        menuPositions[pos]++;
+      }
+      mainMenuImage(menuPositions[pos]);
+      encoderPos = 0;
+    }
+  }
   delay(10);
 }
