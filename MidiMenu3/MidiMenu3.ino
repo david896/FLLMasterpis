@@ -15,22 +15,22 @@
 #define dgt3 CRGB(222, 1, 245);
 #define dgt4 CRGB(255, 0, 0);
 
-#define LED_PIN1 17   // GPIO pin connected to the LED strip
+#define LED_PIN1 27   // GPIO pin connected to the LED strip
 #define NUM_LEDS1 25  // Number of LEDs in the LED strip
 
-#define LED_PIN2 26   // GPIO pin connected to the LED strip
+#define LED_PIN2 25   // GPIO pin connected to the LED strip
 #define NUM_LEDS2 25  // Number of LEDs in the LED strip
 
-#define LED_PIN3 27   // GPIO pin connected to the LED strip
+#define LED_PIN3 32   // GPIO pin connected to the LED strip
 #define NUM_LEDS3 25  // Number of LEDs in the LED strip
 
-#define LED_PIN4 32  // GPIO pin connected to the LED strip
+#define LED_PIN4 12  // GPIO pin connected to the LED strip
 #define NUM_LEDS4 25
 
-#define LED_PIN5 12  // GPIO pin connected to the LED strip
+#define LED_PIN5 4 // GPIO pin connected to the LED strip
 #define NUM_LEDS5 25
 
-#define LED_PIN6 19
+#define LED_PIN6 0
 #define NUM_LEDS6 25
 
 #define LED_TYPE WS2812
@@ -440,6 +440,7 @@ void clear_leds(){
 String paired_add = "";
 bool on = false;
 void loop() {
+  /*
   //check if button for power is pressed then prepare everything
   if(BUTTON_POWER == 0) {
     rainbow();
@@ -506,5 +507,6 @@ void loop() {
       if (songname == "ON") rainbow();
       if (songname == "OFF") clear_leds();
     }
-  }
+  }*/
+  rainbow();
 }
