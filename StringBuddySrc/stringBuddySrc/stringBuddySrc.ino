@@ -109,10 +109,15 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(encoderPinB), updateCounter, CHANGE);
 
   mainMenuImage(menuPositions[pos]);
+  
+  strum(1000, true, false, 3);
+  
 }
 
 void loop() {
+  strumLoop();
   detectHold();
+
   if (pos == 0)
   {
     if (encoderPos < -1) {

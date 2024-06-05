@@ -23,11 +23,6 @@
 
 #define TOTAL_MENUS 5
 
-#define finger1 CRGB(255, 162, 0);
-#define finger2 CRGB(0, 255, 0);
-#define finger3 CRGB(222, 1, 245);
-#define finger4 CRGB(255, 0, 0);
-
 CRGB leds1[NUM_LEDS1];
 CRGB leds2[NUM_LEDS2];
 CRGB leds3[NUM_LEDS3];
@@ -53,7 +48,7 @@ void clearLeds() {
   FastLED.clear();
 }
 
-void turnOnFret(CRGB leds[], int fret, CRGB color) {
+void turnOnLedsForFret(CRGB leds[], int fret, CRGB color) {
   if (fret <= 3) {
     leds[fret + 3] = color;
   } else if (fret == 4) {
@@ -72,30 +67,150 @@ void turnOnFret(CRGB leds[], int fret, CRGB color) {
   }
 }
 
-void turnOnLed(int string, int fret, CRGB fingerColor) {
+void turnOnFret(int string, int fret, int finger) {
   if (fret > 12)
     return;
 
+  CRGB fingerColor = CRGB(0, 0, 0);
+
+  if (finger == 1) {
+    fingerColor = CRGB(255, 162, 0);  //finger1 color
+  } else if (finger == 2) {
+    fingerColor = CRGB(0, 255, 0);  //finger2 color
+  } else if (finger == 3) {
+    fingerColor = CRGB(222, 1, 245);  //finger3 color
+  } else if (finger == 4) {
+    fingerColor = CRGB(255, 0, 0);  //finger4 color
+  }
+
   switch (string) {
     case 1:
-      turnOnFret(leds1, fret, fingerColor);
+      turnOnLedsForFret(leds1, fret, fingerColor);
       break;
     case 2:
-      turnOnFret(leds2, fret, fingerColor);
+      turnOnLedsForFret(leds2, fret, fingerColor);
       break;
     case 3:
-      turnOnFret(leds3, fret, fingerColor);
+      turnOnLedsForFret(leds3, fret, fingerColor);
       break;
     case 4:
-      turnOnFret(leds4, fret, fingerColor);
+      turnOnLedsForFret(leds4, fret, fingerColor);
       break;
     case 5:
-      turnOnFret(leds5, fret, fingerColor);
+      turnOnLedsForFret(leds5, fret, fingerColor);
       break;
-    case 6:  
-      turnOnFret(leds6, fret, fingerColor);
+    case 6:
+      turnOnLedsForFret(leds6, fret, fingerColor);
       break;
   }
 
   FastLED.show();
+}
+
+bool strumming = false;
+int strumIndex = 0;
+unsigned long strumDuration;
+unsigned long lastStrumLed;
+bool strumUp;
+bool loopStrumming;
+int globalCount = 0;
+int globalCount2 = 3;
+void clearStrummingLeds() {
+  CRGB color = CRGB(0, 0, 0);
+  leds1[0] = color;
+  leds1[1] = color;
+  leds2[0] = color;
+  leds2[1] = color;
+  leds3[0] = color;
+  leds3[1] = color;
+  leds4[0] = color;
+  leds4[1] = color;
+  leds5[0] = color;
+  leds5[1] = color;
+  leds6[0] = color;
+  leds6[1] = color;
+}
+
+void turnOnLedsForStrum(int string) {
+  CRGB color = CRGB(255, 255, 0);  //strum color
+  if (string == 1) {
+    leds1[0] = color;
+    leds1[1] = color;
+  } else if (string == 2) {
+    leds2[0] = color;
+    leds2[1] = color;
+  } else if (string == 3) {
+    leds3[0] = color;
+    leds3[1] = color;
+  } else if (string == 4) {
+    leds4[0] = color;
+    leds4[1] = color;
+  } else if (string == 5) {
+    leds5[0] = color;
+    leds5[1] = color;
+  } else if (string == 6) {
+    leds6[0] = color;
+    leds6[1] = color;
+  }
+
+  FastLED.show();
+}
+
+ void strum(int strumDuration1, bool up, bool loop, int count, int stringCount = 6) {// stringCount ----- how many strings are being played per strum
+  globalCount2 = count * stringCount;
+  if (up) {
+    strumUp = true;
+    strumIndex = 0;
+  } else{
+    strumUp = false;
+    strumIndex = 7;
+  }
+  loopStrumming = loop;
+  strumming = true;
+  strumDuration = strumDuration1;
+}
+
+void strumLoop() {
+  if (strumming) {
+    if (strumUp) {
+      if (millis() - lastStrumLed > (strumDuration / 6)) {
+        globalCount++;
+        clearStrummingLeds();
+        turnOnLedsForStrum(++strumIndex);
+        if (strumIndex == 6) {
+          if (loopStrumming) {
+            strumUp = false;
+          } else {
+            strumIndex = 0;
+          }
+        }
+        lastStrumLed = millis();
+      }
+    } else {
+      if (millis() - lastStrumLed > (strumDuration / 6)) {
+        globalCount++;
+        clearStrummingLeds();
+        turnOnLedsForStrum(--strumIndex);
+        if (strumIndex == 1) {
+          if (loopStrumming) {
+            strumUp = true;
+          } else {
+            strumIndex = 7;
+          }
+        }
+        lastStrumLed = millis();
+      }
+    }
+  }
+
+  if(globalCount == globalCount2){
+   strumming = false;
+   globalCount = 0;
+  }
+}
+
+
+
+void stopStrumming() {
+  strumming = false;
 }
