@@ -45,7 +45,7 @@ void updateCounter() {
 
 void writeInTheMiddle(const char* text) {
   tft.setTextColor(TFT_WHITE);
-  tft.setTextSize(2);
+  tft.setTextSize(3);
 
   // Print the message in the center of the screen
   // Calculate the center coordinates
@@ -69,11 +69,16 @@ void mainMenuImage(int counter) {
 
 void detectHold() {
   if (digitalRead(encoderButton) == LOW) {
+    clearLeds();
     isClicked = true;
     if (millis() - clickTime >= longPressDuration && !isLongClick) {  //long press
+
       isLongClick = true;
       if (pos > 0) pos--;
       mainMenuImage(menuPositions[pos]);
+
+      stopStrumming(); 
+      
     }
   }
   if (digitalRead(encoderButton) == HIGH) {
@@ -83,12 +88,34 @@ void detectHold() {
         mainMenuImage(menuPositions[pos]);
         menuPositions[1] = 0;
       } else if (pos > 0) {
-        //run submenu action
+        submenuAction();
       }
     }
     clickTime = millis();
     isClicked = false;
     isLongClick = false;
+  }
+}
+
+void submenuAction() {
+  Serial.print(menuPositions[1]);
+  if (menuPositions[0] == 1 && menuPositions[1] == 3) {
+    Cchord();
+  }
+  if (menuPositions[0] == 1 && menuPositions[1] == 5) {
+    Dchord();
+  }
+  if (menuPositions[0] == 1 && menuPositions[1] == 0) {
+    Achord();
+  }
+  if (menuPositions[0] == 1 && menuPositions[1] == 10) {
+    Gchord();
+  }
+  if (menuPositions[0] == 1 && menuPositions[1] == 7) {
+    Echord();
+  }
+  if (menuPositions[0] == 1 && menuPositions[1] == 8) {
+    Fchord();
   }
 }
 
@@ -109,17 +136,19 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(encoderPinB), updateCounter, CHANGE);
 
   mainMenuImage(menuPositions[pos]);
-  
-  strum(1000, true, false, 3);
+
+
   
 }
 
 void loop() {
   strumLoop();
+
   detectHold();
 
   if (pos == 0)
   {
+    clearLeds();
     if (encoderPos < -1) {
       int length = sizeof(imageDataBase) / sizeof(imageDataBase[0]);
       if (menuPositions[pos] - 1 < 0) {
@@ -146,8 +175,12 @@ void loop() {
       int length = optionsLengths[menuPositions[0]];
       if (menuPositions[pos] - 1 < 0) {
         menuPositions[pos] = length - 1;
+        clearLeds();
+
       } else {
         menuPositions[pos]--;
+        clearLeds();
+
       }
       mainMenuImage(menuPositions[pos]);
       encoderPos = 0;
@@ -155,12 +188,17 @@ void loop() {
       int length = optionsLengths[menuPositions[0]];
       if (menuPositions[pos] + 1 > length - 1) {
         menuPositions[pos] = 0;
+        clearLeds();
+
       } else {
         menuPositions[pos]++;
+        clearLeds();
+ 
       }
       mainMenuImage(menuPositions[pos]);
       encoderPos = 0;
     }
   }
   delay(10);
+  
 }

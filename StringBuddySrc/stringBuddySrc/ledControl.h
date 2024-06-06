@@ -115,6 +115,7 @@ bool strumUp;
 bool loopStrumming;
 int globalCount = 0;
 int globalCount2 = 3;
+
 void clearStrummingLeds() {
   CRGB color = CRGB(0, 0, 0);
   leds1[0] = color;
@@ -130,6 +131,13 @@ void clearStrummingLeds() {
   leds6[0] = color;
   leds6[1] = color;
 }
+
+void stopStrumming() {
+  strumming = false; 
+
+}
+
+
 
 void turnOnLedsForStrum(int string) {
   CRGB color = CRGB(255, 255, 0);  //strum color
@@ -201,16 +209,61 @@ void strumLoop() {
         lastStrumLed = millis();
       }
     }
+  } else {
+    clearStrummingLeds();
+    Serial.print("clearing leds");
   }
 
   if(globalCount == globalCount2){
-   strumming = false;
-   globalCount = 0;
+    globalCount = 0;
+    clearStrummingLeds();
+    strumming = false;
+   
   }
 }
 
 
 
-void stopStrumming() {
-  strumming = false;
+
+
+void Cchord() {
+  clearLeds();
+  turnOnFret(2,12,1);
+  turnOnFret(4,11,2);
+  turnOnFret(5,10,3);
+}
+
+void Dchord() {
+  clearLeds();
+  turnOnFret(1,11,2);
+  turnOnFret(2,10,3);
+  turnOnFret(3,11,1);
+}
+
+void Achord() {
+  clearLeds();
+  turnOnFret(2,11,3);
+  turnOnFret(3,11,2);
+  turnOnFret(4,11,1);
+}
+
+void Gchord() {
+  clearLeds();
+  turnOnFret(1,10,3);
+  turnOnFret(5,11,2);
+  turnOnFret(6,10,1);
+}
+
+void Echord() {
+  clearLeds();
+  turnOnFret(4,11,2);
+  turnOnFret(5,11,1);
+}
+
+void Fchord() {
+  clearLeds();
+  turnOnFret(2,12,1);
+  turnOnFret(3,11,2);
+  turnOnFret(4,10,3);
+  turnOnFret(5,10,4);
 }
