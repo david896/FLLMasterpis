@@ -1,11 +1,11 @@
-const char* songsOptions[] = {"Daca Ploaia S-ar Opri", "Knocking On Heavens Door", "Nothing Else Matters", "Fly Birds"};
+const char* songsOptions[] = {"Daca Ploaia S-ar Opri", "Knocking On Heavens Door", "Nothing Else Matters", "Fly Birds", "Back in Black", "Smells like a Teen Spirit"};
 const char* chordsOptions[] = {"A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"};
 const char* scalesOptions[] = {"A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"};
 const char* gamesOptions[] = {"Replay"};
 const char* settingsOptions[] = {"Brightness", "Firmware"};
 
 const int optionsLengths[] = {
-  4,
+  6,
   12,
   12,
   1,

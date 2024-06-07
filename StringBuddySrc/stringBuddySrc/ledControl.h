@@ -1,4 +1,7 @@
 #include <FastLED.h>
+#include <TFT_eSPI.h>
+
+
 
 #define LED_PIN1 27
 #define NUM_LEDS1 25
@@ -22,6 +25,8 @@
 #define COLOR_ORDER GRB
 
 #define TOTAL_MENUS 5
+
+#define buzzerPin 5
 
 CRGB leds1[NUM_LEDS1];
 CRGB leds2[NUM_LEDS2];
@@ -115,6 +120,10 @@ bool strumUp;
 bool loopStrumming;
 int globalCount = 0;
 int globalCount2 = 3;
+bool buzzerOn = false;
+
+unsigned long buzzerController1 = millis();
+unsigned long buzzerController2 = millis();
 
 void clearStrummingLeds() {
   CRGB color = CRGB(0, 0, 0);
@@ -130,14 +139,13 @@ void clearStrummingLeds() {
   leds5[1] = color;
   leds6[0] = color;
   leds6[1] = color;
+  FastLED.show();
 }
 
 void stopStrumming() {
   strumming = false; 
-
+  clearStrummingLeds();
 }
-
-
 
 void turnOnLedsForStrum(int string) {
   CRGB color = CRGB(255, 255, 0);  //strum color
@@ -178,10 +186,38 @@ void turnOnLedsForStrum(int string) {
   strumDuration = strumDuration1;
 }
 
+void buzzerControl(int timing){
+  if (buzzerOn){
+    if (millis() - buzzerController2 > 50) {
+      buzzerOn = false;
+      buzzerController1 = millis();
+    }
+  } else {
+    if (millis() - buzzerController1 > timing) {
+      buzzerOn = true;
+      buzzerController2 = millis();
+    }
+  }
+}
+
+void buzzerActivator() {
+  Serial.print(buzzerOn);
+  Serial.println("");
+  if (buzzerOn == true) {
+    tone(buzzerPin, 1000);
+  } else {
+    noTone(buzzerPin);
+  }
+}
+
 void strumLoop() {
+  
   if (strumming) {
+    buzzerControl(strumDuration);
     if (strumUp) {
       if (millis() - lastStrumLed > (strumDuration / 6)) {
+
+
         globalCount++;
         clearStrummingLeds();
         turnOnLedsForStrum(++strumIndex);
@@ -196,6 +232,8 @@ void strumLoop() {
       }
     } else {
       if (millis() - lastStrumLed > (strumDuration / 6)) {
+
+
         globalCount++;
         clearStrummingLeds();
         turnOnLedsForStrum(--strumIndex);
@@ -211,7 +249,7 @@ void strumLoop() {
     }
   } else {
     clearStrummingLeds();
-    Serial.print("clearing leds");
+
   }
 
   if(globalCount == globalCount2){
@@ -224,46 +262,231 @@ void strumLoop() {
 
 
 
+void Bchord() {
+  stopStrumming();
+  clearLeds();
+  strum(1000, false, false, 100000);
 
+  turnOnFret(1,11,1);
+  turnOnFret(5,11,1);
+  turnOnFret(2,11,1);
+  turnOnFret(3,11,1);
+  turnOnFret(4,11,1);
+
+  turnOnFret(2,9,2);
+  turnOnFret(3,9,3);
+  turnOnFret(4,9,4);
+}
 
 void Cchord() {
+  stopStrumming();
   clearLeds();
+  strum(1000, false, false, 100000);
+
   turnOnFret(2,12,1);
   turnOnFret(4,11,2);
   turnOnFret(5,10,3);
 }
 
 void Dchord() {
+  stopStrumming();
   clearLeds();
+  strum(1000, false, false, 100000);
+
   turnOnFret(1,11,2);
   turnOnFret(2,10,3);
   turnOnFret(3,11,1);
 }
 
+
+
 void Achord() {
+  stopStrumming();
   clearLeds();
+  strum(1000, false, false, 100000);
+
   turnOnFret(2,11,3);
   turnOnFret(3,11,2);
   turnOnFret(4,11,1);
 }
 
 void Gchord() {
+  stopStrumming();
   clearLeds();
+  strum(1000, false, false, 100000);
+  
   turnOnFret(1,10,3);
   turnOnFret(5,11,2);
   turnOnFret(6,10,1);
 }
 
 void Echord() {
+  stopStrumming();
   clearLeds();
+  strum(1000, false, false, 100000);
+
   turnOnFret(4,11,2);
   turnOnFret(5,11,1);
 }
 
 void Fchord() {
+  stopStrumming();
   clearLeds();
+  strum(1000, false, false, 100000);
+
   turnOnFret(2,12,1);
   turnOnFret(3,11,2);
   turnOnFret(4,10,3);
   turnOnFret(5,10,4);
+}
+
+void Ascale() {
+  stopStrumming();
+  clearLeds();
+  strum(1000, false, false, 100000);
+
+  turnOnFret(1,12,2);
+  turnOnFret(2,12,2);
+  turnOnFret(6,12,2);
+
+  turnOnFret(4,11,2);
+  turnOnFret(5,11,2);
+
+  turnOnFret(1,10,2);
+  turnOnFret(2,10,2);
+  turnOnFret(4,10,2);
+  turnOnFret(5,10,2);
+  turnOnFret(6,10,2);
+
+  turnOnFret(3,9,2);
+
+  turnOnFret(2,8,2);
+  turnOnFret(3,8,2);
+  turnOnFret(4,8,2);
+  turnOnFret(5,8,2);
+
+  turnOnFret(2,7,2);
+
+  turnOnFret(1,6,2);
+  turnOnFret(3,6,2);
+  turnOnFret(5,6,2);
+  turnOnFret(6,6,2);
+
+  turnOnFret(1,5,2);
+  turnOnFret(2,5,2);
+  turnOnFret(5,5,2);
+  turnOnFret(6,5,2);
+
+  turnOnFret(3,4,2);
+  turnOnFret(4,4,2);
+
+  turnOnFret(1,3,2);
+  turnOnFret(3,3,2);
+  turnOnFret(4,3,2);
+  turnOnFret(5,3,2);
+  turnOnFret(6,3,2);
+
+  turnOnFret(1,1,2);
+  turnOnFret(2,1,2);
+  turnOnFret(3,1,2);
+  turnOnFret(4,1,2);
+  turnOnFret(6,1,2);
+
+  turnOnFret(1,8,3);
+  turnOnFret(2,3,3);
+  turnOnFret(3,11,3);
+  turnOnFret(4,6,3);
+  turnOnFret(5,1,3);
+  turnOnFret(6,8,3);
+}
+
+void KnockingOnHeavensDoor() {
+  unsigned long debounce = millis();
+  stopStrumming();
+  clearLeds();
+
+  turnOnFret(1,10,3);
+  turnOnFret(5,11,2);
+  turnOnFret(6,10,1);
+
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+  
+  clearLeds();
+  turnOnFret(1,11,2);
+  turnOnFret(2,10,3);
+  turnOnFret(3,11,1);
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+
+  clearLeds();
+  turnOnFret(2,12,3);
+  turnOnFret(3,11,2);
+  turnOnFret(4,11,1);
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+
+  clearLeds();
+  turnOnFret(2,12,1);
+  turnOnFret(4,11,2);
+  turnOnFret(5,10,3);
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+  tone(5,1000);
+  delay(50);
+  noTone(5);
+  delay(950);
+  
 }

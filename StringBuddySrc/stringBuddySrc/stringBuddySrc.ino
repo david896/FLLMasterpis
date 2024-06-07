@@ -26,6 +26,8 @@ unsigned long clickTime;
 bool isClicked;
 bool isLongClick;
 
+bool singingsog;
+
 int encoderPos = 0;
 
 volatile int lastState = LOW;
@@ -45,16 +47,65 @@ void updateCounter() {
 
 void writeInTheMiddle(const char* text) {
   tft.setTextColor(TFT_WHITE);
-  tft.setTextSize(3);
+  if (menuPositions[0] == 2) {
 
-  // Print the message in the center of the screen
-  // Calculate the center coordinates
-  int centerX = tft.width() / 2;
-  int centerY = tft.height() / 2;
+    tft.setTextSize(10);
+    tft.setTextColor(TFT_CYAN);
+  
+    int centerX = tft.width() / 2;
+    int centerY = tft.height() / 2;
+    int bottomY = tft.height();
 
-  // Print the message at the center coordinates
-  tft.setCursor(centerX - (strlen(text) * 6), centerY - 8);  // Adjust 6 according to your font
-  tft.print(text);
+    tft.setCursor(centerX - (strlen(text) * 15), centerY - 20);  
+    tft.print(text);
+    tft.setTextSize(4);
+    tft.setCursor(centerX - (strlen("Scale") * 12), bottomY - 50);  
+    tft.print("Scale");
+  }
+  if (menuPositions[0] == 4) {
+
+    tft.setTextSize(4);
+    tft.setTextColor(TFT_PURPLE);
+  
+    int centerX = tft.width() / 2;
+    int centerY = tft.height() / 2;
+    int bottomY = tft.height();
+
+    tft.setCursor(centerX - (strlen(text) * 12), centerY - 10);  
+    tft.print(text);
+
+    
+  }
+  if (menuPositions[0] == 1) {
+
+    tft.setTextSize(10);
+    tft.setTextColor(TFT_YELLOW);
+  
+    int centerX = tft.width() / 2;
+    int centerY = tft.height() / 2;
+    int bottomY = tft.height();
+
+    tft.setCursor(centerX - (strlen(text) * 15), centerY - 20);  
+    tft.print(text);
+    tft.setTextSize(4);
+    tft.setCursor(centerX - (strlen("Chord") * 12), bottomY - 50);  
+    tft.print("Chord");
+  }
+  
+  
+  
+   else {
+    tft.setTextSize(2);
+
+  
+    int centerX = tft.width() / 2;
+    int centerY = tft.height() / 2;
+
+  
+    tft.setCursor(centerX - (strlen(text) * 6), centerY - 8);  
+    tft.print(text);
+  }
+  
 }
 
 void mainMenuImage(int counter) {
@@ -67,18 +118,31 @@ void mainMenuImage(int counter) {
   }
 }
 
+void Firmware() {
+  tft.fillScreen(TFT_BLACK);
+  tft.setTextColor(TFT_WHITE);
+  
+  // Set text size
+  tft.setTextSize(10);
+  
+  // Print "STRING BUDDY" in the upper left corner
+  tft.setCursor(0, 0); // Set cursor position
+  tft.print("STRING BUDDY");
+}
+
 void detectHold() {
   if (digitalRead(encoderButton) == LOW) {
-    clearLeds();
+    
     isClicked = true;
     if (millis() - clickTime >= longPressDuration && !isLongClick) {  //long press
 
       isLongClick = true;
       if (pos > 0) pos--;
       mainMenuImage(menuPositions[pos]);
-
+      singingsog = false;
       stopStrumming(); 
-      
+      clearLeds();
+
     }
   }
   if (digitalRead(encoderButton) == HIGH) {
@@ -98,7 +162,12 @@ void detectHold() {
 }
 
 void submenuAction() {
-  Serial.print(menuPositions[1]);
+  if (menuPositions[0] == 2 && menuPositions[1] == 0) {
+    Ascale();
+  }
+  if (menuPositions[0] == 0 && menuPositions[1] == 1) {
+    singingsog = true;
+  }
   if (menuPositions[0] == 1 && menuPositions[1] == 3) {
     Cchord();
   }
@@ -116,6 +185,12 @@ void submenuAction() {
   }
   if (menuPositions[0] == 1 && menuPositions[1] == 8) {
     Fchord();
+  }
+  if (menuPositions[0] == 1 && menuPositions[1] == 2) {
+    Bchord();
+  }
+  if (menuPositions[0] == 1 && menuPositions[1] == 4) {
+    Firmware();
   }
 }
 
@@ -137,11 +212,17 @@ void setup() {
 
   mainMenuImage(menuPositions[pos]);
 
-
-  
 }
 
+
+
 void loop() {
+  if (singingsog) {
+    KnockingOnHeavensDoor();
+  }
+
+  buzzerActivator();
+
   strumLoop();
 
   detectHold();
@@ -175,11 +256,11 @@ void loop() {
       int length = optionsLengths[menuPositions[0]];
       if (menuPositions[pos] - 1 < 0) {
         menuPositions[pos] = length - 1;
-        clearLeds();
+
 
       } else {
         menuPositions[pos]--;
-        clearLeds();
+
 
       }
       mainMenuImage(menuPositions[pos]);
@@ -188,11 +269,11 @@ void loop() {
       int length = optionsLengths[menuPositions[0]];
       if (menuPositions[pos] + 1 > length - 1) {
         menuPositions[pos] = 0;
-        clearLeds();
+
 
       } else {
         menuPositions[pos]++;
-        clearLeds();
+
  
       }
       mainMenuImage(menuPositions[pos]);
