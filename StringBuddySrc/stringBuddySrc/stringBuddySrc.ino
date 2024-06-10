@@ -92,9 +92,9 @@ void writeInTheMiddle(const char* text) {
     tft.print("Chord");
   }
   
-  
-  
-   else {
+  if (menuPositions[0] == 0) {
+    tft.setTextColor(TFT_PINK);
+
     tft.setTextSize(2);
 
   
@@ -105,6 +105,21 @@ void writeInTheMiddle(const char* text) {
     tft.setCursor(centerX - (strlen(text) * 6), centerY - 8);  
     tft.print(text);
   }
+  if (menuPositions[0] == 3) {
+    tft.setTextColor(TFT_GREEN);
+
+    tft.setTextSize(6);
+
+  
+    int centerX = tft.width() / 2;
+    int centerY = tft.height() / 2;
+
+  
+    tft.setCursor(centerX - (strlen(text) * 1), centerY - 8);  
+    tft.print(text);
+  }
+  
+  
   
 }
 
@@ -166,6 +181,7 @@ void submenuAction() {
     Ascale();
   }
   if (menuPositions[0] == 0 && menuPositions[1] == 1) {
+    debounce = millis();
     singingsog = true;
   }
   if (menuPositions[0] == 1 && menuPositions[1] == 3) {

@@ -121,6 +121,7 @@ bool loopStrumming;
 int globalCount = 0;
 int globalCount2 = 3;
 bool buzzerOn = false;
+unsigned long debounce = 0;
 
 unsigned long buzzerController1 = millis();
 unsigned long buzzerController2 = millis();
@@ -201,8 +202,7 @@ void buzzerControl(int timing){
 }
 
 void buzzerActivator() {
-  Serial.print(buzzerOn);
-  Serial.println("");
+  
   if (buzzerOn == true) {
     tone(buzzerPin, 1000);
   } else {
@@ -249,7 +249,7 @@ void strumLoop() {
     }
   } else {
     clearStrummingLeds();
-
+    buzzerOn = false;
   }
 
   if(globalCount == globalCount2){
@@ -259,8 +259,6 @@ void strumLoop() {
    
   }
 }
-
-
 
 void Bchord() {
   stopStrumming();
@@ -297,8 +295,6 @@ void Dchord() {
   turnOnFret(2,10,3);
   turnOnFret(3,11,1);
 }
-
-
 
 void Achord() {
   stopStrumming();
@@ -400,93 +396,68 @@ void Ascale() {
   turnOnFret(6,8,3);
 }
 
+
+
 void KnockingOnHeavensDoor() {
-  unsigned long debounce = millis();
-  stopStrumming();
-  clearLeds();
-
-  turnOnFret(1,10,3);
-  turnOnFret(5,11,2);
-  turnOnFret(6,10,1);
-
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
   
-  clearLeds();
-  turnOnFret(1,11,2);
-  turnOnFret(2,10,3);
-  turnOnFret(3,11,1);
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
 
-  clearLeds();
-  turnOnFret(2,12,3);
-  turnOnFret(3,11,2);
-  turnOnFret(4,11,1);
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
 
-  clearLeds();
-  turnOnFret(2,12,1);
-  turnOnFret(4,11,2);
-  turnOnFret(5,10,3);
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
-  tone(5,1000);
-  delay(50);
-  noTone(5);
-  delay(950);
+  unsigned long time = (millis() - debounce)/100;
+  
+  
+  switch (time) { 
+    case 1:
+
+      stopStrumming();
+      clearLeds();
+      strum(1000, false, false, 2);
+      turnOnFret(1,10,3);
+      turnOnFret(5,11,2);
+      turnOnFret(6,10,1);
+      break;
+    case 20:
+      stopStrumming();
+      strum(250, false, true, 2);
+      break;
+    case 27:
+
+      stopStrumming();
+      clearLeds();
+      strum(1000, false, false, 2);
+      turnOnFret(1,11,2);
+      turnOnFret(2,10,3);
+      turnOnFret(3,11,1);
+      break;
+    case 47:
+      stopStrumming();
+      strum(250, false, true, 2);
+      break;
+    case 56:
+
+      stopStrumming();
+      clearLeds();
+      strum(1000, false, false, 2);
+      turnOnFret(2,12,3);
+      turnOnFret(3,11,2);
+      turnOnFret(4,11,1);
+      break;
+    case 76:
+      stopStrumming();
+      strum(250, false, true, 2);
+      break;
+    case 84:
+      stopStrumming();
+      clearLeds();
+      strum(1000, false, false, 2);
+      turnOnFret(2,12,3);
+      turnOnFret(3,11,2);
+      turnOnFret(4,11,1);
+      break;
+    case 108:
+      stopStrumming();
+      strum(250, true, false, 1);
+      break;
+  }
+  
   
 }
