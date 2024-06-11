@@ -339,7 +339,7 @@ void Fchord() {
 void Ascale() {
   stopStrumming();
   clearLeds();
-  strum(1000, false, false, 100000);
+
 
   turnOnFret(1,12,2);
   turnOnFret(2,12,2);

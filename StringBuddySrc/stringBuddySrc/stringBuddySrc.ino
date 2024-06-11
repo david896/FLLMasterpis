@@ -115,7 +115,7 @@ void writeInTheMiddle(const char* text) {
     int centerY = tft.height() / 2;
 
   
-    tft.setCursor(centerX - (strlen(text) * 1), centerY - 8);  
+    tft.setCursor(centerX - (strlen(text) * 18), centerY - 8);  
     tft.print(text);
   }
   
@@ -133,16 +133,55 @@ void mainMenuImage(int counter) {
   }
 }
 
-void Firmware() {
+void songCountdown(){
+  
+  for (int i=3; i>0; i--) {
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextSize(4);
+    tft.setTextColor(TFT_PINK);
+  
+    int centerX = tft.width() / 2;
+    int centerY = tft.height() / 2;
+    
+    CRGB color = CRGB(255, 150, 0);
+    leds1[0] = color;
+    leds1[1] = color;
+    leds2[0] = color;
+    leds2[1] = color;
+    leds3[0] = color;
+    leds3[1] = color;
+    leds4[0] = color;
+    leds4[1] = color;
+    leds5[0] = color;
+    leds5[1] = color;
+    leds6[0] = color;
+    leds6[1] = color;
+    FastLED.show(); 
+    tone(5, 1000);
+    tft.setCursor(centerX - 12, centerY - 10);  
+    tft.print(i);
+    delay(50);
+    noTone(5);
+    delay(950);
+
+    clearStrummingLeds();
+    buzzerOn = false;
+
+    
+  }
+  noTone(5);
   tft.fillScreen(TFT_BLACK);
-  tft.setTextColor(TFT_WHITE);
+  tft.setTextColor(TFT_PINK);
+
+    tft.setTextSize(3);
+
   
-  // Set text size
-  tft.setTextSize(10);
+    int centerX = tft.width() / 2;
+    int centerY = tft.height() / 2;
+
   
-  // Print "STRING BUDDY" in the upper left corner
-  tft.setCursor(0, 0); // Set cursor position
-  tft.print("STRING BUDDY");
+    tft.setCursor(centerX - (strlen("Now Playing:") * 9), centerY - 8);  
+    tft.print("Now Playing:");
 }
 
 void detectHold() {
@@ -181,6 +220,7 @@ void submenuAction() {
     Ascale();
   }
   if (menuPositions[0] == 0 && menuPositions[1] == 1) {
+    songCountdown();
     debounce = millis();
     singingsog = true;
   }
@@ -205,9 +245,7 @@ void submenuAction() {
   if (menuPositions[0] == 1 && menuPositions[1] == 2) {
     Bchord();
   }
-  if (menuPositions[0] == 1 && menuPositions[1] == 4) {
-    Firmware();
-  }
+  
 }
 
 void setup() {
