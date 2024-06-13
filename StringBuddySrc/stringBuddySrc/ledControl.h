@@ -410,7 +410,7 @@ void KnockingOnHeavensDoor() {
 
       stopStrumming();
       clearLeds();
-      strum(1000, false, false, 2);
+      strum(900, false, false, 2);
       turnOnFret(1,10,3);
       turnOnFret(5,11,2);
       turnOnFret(6,10,1);
@@ -428,12 +428,11 @@ void KnockingOnHeavensDoor() {
       turnOnFret(2,10,3);
       turnOnFret(3,11,1);
       break;
-    case 47:
+    case 48:
       stopStrumming();
       strum(250, false, true, 2);
       break;
     case 56:
-
       stopStrumming();
       clearLeds();
       strum(1000, false, false, 2);
@@ -441,11 +440,11 @@ void KnockingOnHeavensDoor() {
       turnOnFret(3,11,2);
       turnOnFret(4,11,1);
       break;
-    case 76:
+    case 78:
       stopStrumming();
       strum(250, false, true, 2);
       break;
-    case 84:
+    case 85:
       stopStrumming();
       clearLeds();
       strum(1000, false, false, 2);
@@ -453,9 +452,12 @@ void KnockingOnHeavensDoor() {
       turnOnFret(3,11,2);
       turnOnFret(4,11,1);
       break;
-    case 108:
+    case 107:
       stopStrumming();
       strum(250, true, false, 1);
+      break;
+    case 112:
+      stopStrumming();
       break;
   }
   
