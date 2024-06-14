@@ -191,7 +191,10 @@ void detectHold() {
     if (millis() - clickTime >= longPressDuration && !isLongClick) {  //long press
 
       isLongClick = true;
-      if (pos > 0) pos--;
+      if (pos > 0){
+        pos--;
+        menuPositions[1] = 0;
+      } 
       mainMenuImage(menuPositions[pos]);
       singingsog = false;
       stopStrumming(); 
